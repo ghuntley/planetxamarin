@@ -182,6 +182,8 @@ namespace Firehose.Web.Infrastructure
 				LastUpdatedTime = DateTimeOffset.UtcNow
             };
 
+            AddTwitterHandlesToFeed(feed);        
+
             foreach(var tamarin in tamarins)
             {
                 feed.Contributors.Add(new SyndicationPerson(
@@ -191,6 +193,85 @@ namespace Firehose.Web.Infrastructure
             return feed;
         }
 
+        private void AddTwitterHandlesToFeed(SyndicationFeed feed)
+        {
+            foreach (var item in feed.Items)
+            {
+                var author = Tamarins.FirstOrDefault(a => MatchesAuthorUrls(a, item.Links.Select(l => l.Uri), item));
+                if (!string.IsNullOrWhiteSpace(item.Title.Type) && author != null && !string.IsNullOrEmpty(author.TwitterHandle))
+                {
+                    item.Title = new TextSyndicationContent(item.Title.Text + " @" + author.TwitterHandle, GetTextKind(item.Title.Type));
+                }
+                else if (author != null && !string.IsNullOrEmpty(author.TwitterHandle))
+                {
+                    item.Title = new TextSyndicationContent(item.Title.Text + " @" + author.TwitterHandle);
+                }
+            }
+        }
+
+        private bool MatchesAuthorUrls(IAmACommunityMember author, IEnumerable<Uri> urls, SyndicationItem item)
+        {
+            var authorHosts = author.FeedUris.Select(au => au.Host.ToLowerInvariant()).Concat(new[] { author.WebSite.Host.ToLowerInvariant() }).ToArray();
+            var feedBurnerAuthors = author.FeedUris.Where(au => au.Host.Contains("feeds.feedburner")).ToList();
+            var mediumAuthors = author.FeedUris.Where(au => au.Host.Contains("medium.com")).ToList();
+            var youtubeAuthors = author.FeedUris.Where(au => au.Host.Contains("youtube.com")).ToList();
+
+            foreach (var itemUrl in urls)
+            {
+                var host = itemUrl.Host.ToLowerInvariant();
+
+                if (host.Contains("medium.com"))
+                {
+                    if (itemUrl.Segments.Count() >= 3)
+                    {
+                        var mediumId = itemUrl.Segments[1].Trim('/');
+                        return mediumAuthors.Any(fba => fba.AbsoluteUri.Contains(mediumId));
+                    }
+                }
+
+                if (host.Contains("feedproxy.google")) //  feed burner is messed up :(
+                {
+                    // url will look like:
+                    // feedproxy.google.com/~r/<feedburnerId>/~3/bgJNuDXwkU0/O
+                    if (itemUrl.Segments.Count() >= 5)
+                    {
+                        var feedBurnerId = itemUrl.Segments[2].Trim('/');
+                        return feedBurnerAuthors.Any(fba => fba.AbsoluteUri.Contains(feedBurnerId));
+                    }
+                }
+
+                if (host.Contains("youtube.com")) //need to match youtube channel
+                {
+                    var channel = item?.Authors?.FirstOrDefault()?.Uri;
+                    if (channel == null)
+                        return false;
+
+                    var id = channel.Replace("https://www.youtube.com/channel/", string.Empty);
+
+                    return youtubeAuthors.Any(yt => yt.AbsoluteUri.Contains(id));
+                }
+
+                if (authorHosts.Contains(host))
+                    return true;
+
+                if (authorHosts.Contains(host.Replace("www.", "")))
+                    return true;
+
+                if (authorHosts.Contains(host.Insert(0, "www.")))
+                    return true;
+            }
+
+            return false;
+        }
+
+        TextSyndicationContentKind GetTextKind(string type)
+        {
+            if (type == "text")
+                return (TextSyndicationContentKind)Enum.Parse(typeof(TextSyndicationContentKind), "Plaintext", true);
+            else
+                return (TextSyndicationContentKind)Enum.Parse(typeof(TextSyndicationContentKind), type, true);
+        }
+        
         private static Func<SyndicationItem, bool> GetFilterFunction(IAmACommunityMember tamarin)
         {
             if (tamarin is IFilterMyBlogPosts filterMyBlogPosts)
