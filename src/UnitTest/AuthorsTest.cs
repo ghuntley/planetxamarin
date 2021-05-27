@@ -16,7 +16,6 @@ namespace UnitTest
 		{
 			nameof(IAmACommunityMember),
 			nameof(IWorkAtXamarinOrMicrosoft),
-			nameof(IAmAXamarinMVP),
 			nameof(IAmAMicrosoftMVP),
 			nameof(IAmAPodcast),
 			nameof(IAmANewsletter),

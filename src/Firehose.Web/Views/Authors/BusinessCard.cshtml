@@ -9,18 +9,9 @@
         <strong>@Model.FirstName @Model.LastName</strong><br />
         <span title="Planet Xamarin | @Model.ShortBioOrTagLine">@Model.ShortBioOrTagLine</span><br />
         @Model.StateOrRegion<br />
-        @if (Model is IAmAXamarinMVP || Model is IAmAMicrosoftMVP)
+        @if (Model is IAmAMicrosoftMVP)
         {
             string output = string.Empty;
-            var xamarinMvpModel = Model as IAmAXamarinMVP;
-            if (xamarinMvpModel != null)
-            {
-                output += " Xamarin MVP";
-                if (Model is IAmAMicrosoftMVP)
-                {
-                    output += " and";
-                }
-            }
             var microsoftMvpModel = Model as IAmAMicrosoftMVP;
             if (microsoftMvpModel != null)
             {

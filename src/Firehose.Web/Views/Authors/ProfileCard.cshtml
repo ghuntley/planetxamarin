@@ -24,17 +24,12 @@
                 }
                 else
                 {
-                    if (Model is IAmAXamarinMVP || Model is IAmAMicrosoftMVP)
+                    if (Model is IAmAMicrosoftMVP)
                     {
                         <text>@Model.FirstName @Model.LastName is</text>
 
                         var output = string.Empty;
-                        var xamarinMvpModel = Model as IAmAXamarinMVP;
-                        if (xamarinMvpModel != null)
-                        {
-                            output += "a Xamarin";
-                        }
-                        if (Model is IAmAXamarinMVP && Model is IAmAMicrosoftMVP)
+                        if (Model is IAmAMicrosoftMVP)
                         {
                             output += " and Microsoft";
                         }

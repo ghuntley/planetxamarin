@@ -4,7 +4,7 @@ using Firehose.Web.Infrastructure;
 
 namespace Firehose.Web.Authors
 {
-    public class KerryLothrop : IAmAMicrosoftMVP, IAmAXamarinMVP
+    public class KerryLothrop : IAmAMicrosoftMVP
     {
         public string FirstName => "Kerry W.";
         public string LastName => "Lothrop";

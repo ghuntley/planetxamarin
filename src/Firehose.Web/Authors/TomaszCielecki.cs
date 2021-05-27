@@ -4,7 +4,7 @@ using Firehose.Web.Infrastructure;
 
 namespace Firehose.Web.Authors
 {
-    public class TomaszCielecki : IAmAXamarinMVP, IAmAMicrosoftMVP
+    public class TomaszCielecki : IAmAMicrosoftMVP
     {
         public IEnumerable<Uri> FeedUris
         {

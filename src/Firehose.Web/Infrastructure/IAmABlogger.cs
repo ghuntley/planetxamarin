@@ -40,10 +40,6 @@ namespace Firehose.Web.Infrastructure
     {
     }
 
-    public interface IAmAXamarinMVP : IAmACommunityMember
-    {
-    }
-
     public interface IAmAMicrosoftMVP : IAmACommunityMember
     {
     }
