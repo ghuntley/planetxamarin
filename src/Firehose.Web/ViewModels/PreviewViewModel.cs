@@ -97,12 +97,15 @@ namespace Firehose.Web.ViewModels
 
 				var link = item.Links.FirstOrDefault()?.Uri.ToString() ?? string.Empty;
 				var html = item.Content?.ToHtml() ?? item.Summary?.ToHtml() ?? string.Empty;
+				var titleSuffix = string.IsNullOrEmpty(author.TwitterHandle) 
+									? string.Empty
+									: ", by @" + author.TwitterHandle;
 
 				var previewItem = new PreviewModelItem
 				{
 					AuthorName = authorName,
 					Gravatar = author?.GravatarImage(),
-					Title = item.Title.Text,
+					Title = item.Title.Text + titleSuffix,
 					Link = link,
 					Body = html.Sanitize(),
 					PublishDate = item.PublishDate.Humanize()
